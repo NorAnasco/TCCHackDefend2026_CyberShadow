@@ -1,0 +1,25 @@
+services:
+  # 1. Le Serveur Central d'Analyse (Python FastAPI)
+  - type: web
+    name: kefyl-soc-central-api
+    env: python
+    rootDir: server_central
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: GEMINI_API_KEY
+        sync: true # Demande à l'utilisateur sa clé en direct
+
+  # 2. Le Dashboard d'Administration du SOC (React / Express fullstack)
+  - type: web
+    name: kefyl-soc-dashboard
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18.16.0
+      - key: GEMINI_API_KEY
+        sync: true # Optionnel si configuré sur le client de l'enquêtrice
