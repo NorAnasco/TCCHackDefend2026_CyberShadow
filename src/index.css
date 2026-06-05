@@ -1,0 +1,291 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Inter", var(--font-sans);
+  --font-mono: "Inter", var(--font-sans);
+}
+
+:root {
+  --bg-principal: #040814;
+  --bg-card: #0B1226;
+  --bg-hover: #121F3F;
+  --bg-wow: #121A2F;
+  --border-color: rgba(59, 130, 246, 0.2);
+  
+  --text-principal: #FFFFFF;
+  --text-secondary: #94A3B8;
+  
+  --color-accent: #3B82F6;
+  --color-accent-secondary: #06B6D4;
+  --color-danger: #EF4444;
+  --color-warning: #F59E0B;
+  --color-success: #10B981;
+}
+
+@layer base {
+  body {
+    background-color: #040814 !important;
+    color: #F1F5F9 !important;
+    font-family: "Inter", sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Force global uniform typography across everything */
+* {
+  font-family: "Inter", sans-serif !important;
+}
+
+/* Base resets & extreme contrast protection */
+
+/* Main backdrop */
+.bg-\[\#0B1020\] {
+  background-color: #040814 !important;
+  color: #FFFFFF !important;
+}
+
+/* Premium Dark Steel Royal Blue Cards with high contrast cyber borders */
+.bg-\[\#121A2F\] {
+  background-color: #0B1226 !important;
+  color: #FFFFFF !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Custom Header area */
+header.bg-\[\#121A2F\]\/45 {
+  background-color: rgba(4, 8, 20, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+  border-bottom-width: 1px !important;
+}
+
+/* Sub-containers & panels */
+.bg-\[\#0B1020\]\/45 {
+  background-color: #060B1C !important;
+  color: #FFFFFF !important;
+  border-color: rgba(59, 130, 246, 0.15) !important;
+  border-width: 1px !important;
+}
+
+/* Hover areas, selected list rows, and accents inside cards */
+.bg-\[\#1A2542\] {
+  background-color: #121F3F !important;
+  color: #FFFFFF !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+}
+
+/* Guarantee extreme contrast text visibility on dark elements */
+.text-white,
+h1, h2, h3, h4, h5, h6,
+strong,
+th,
+.text-slate-100 {
+  color: #FFFFFF !important;
+}
+
+.text-\[\#94A3B8\],
+.text-slate-400,
+.text-slate-500,
+p {
+  color: #94A3B8 !important;
+}
+
+.text-slate-300 {
+  color: #CBD5E1 !important;
+}
+
+/* ── Harmonization of Light Gray Bands / Table Headers and Lists ── */
+/* If elements have bg-slate-100/50, we override them to premium cyber slate backgrounds so they NEVER look like washed out gray-on-dark! */
+thead tr, 
+.bg-slate-100, 
+.bg-slate-50,
+.bg-slate-200 {
+  background-color: #0E1A33 !important;
+  color: #FFFFFF !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Sub-indicators or headers like "Identificateur inspecté" */
+td.bg-slate-100,
+th.bg-slate-100 {
+  background-color: #13244D !important;
+  color: #FFFFFF !important;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.25) !important;
+  border-right: 1px solid rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Override text-slate-700/600 labels inside grey bands with highly legible white/cyan values */
+.bg-slate-100 *, 
+.bg-slate-50 *,
+.text-slate-700,
+.text-slate-600,
+.text-gray-700,
+.text-gray-600 {
+  color: #CBD5E1 !important;
+}
+
+/* Sidebar navigation in clean royal blue & cyan highlight theme */
+aside.bg-\[\#121A2F\] {
+  background-color: #050B1D !important;
+  color: #FFFFFF !important;
+  border-right: 1px solid rgba(59, 130, 246, 0.25) !important;
+}
+
+aside.bg-\[\#121A2F\] .text-\[\#94A3B8\],
+aside.bg-\[\#121A2F\] .text-slate-400 {
+  color: #38BDF8 !important;
+}
+
+aside.bg-\[\#121A2F\] .bg-\[\#1A2542\],
+aside.bg-\[\#121A2F\] button:hover {
+  background-color: #101F42 !important;
+  border-color: #38BDF8 !important;
+  color: #FFFFFF !important;
+}
+
+/* Inputs & select options visibility */
+input, select, textarea {
+  background-color: #050B1D !important;
+  color: #FFFFFF !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  outline: none !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #38BDF8 !important;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+}
+
+/* Table rules and alignments */
+table, tr, td, th {
+  border-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+/* Recharts Tooltip matching high-performance dark theme */
+.recharts-default-tooltip {
+  background-color: #0B1226 !important;
+  border-color: #38BDF8 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7) !important;
+  border-radius: 8px !important;
+}
+
+/* Better visible scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #040814;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #121F3F;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #38BDF8;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ── SCREEN PREVIEWS AND PRINTABLE AREA CYBER THEME HARMONIZATION ──
+   ───────────────────────────────────────────────────────────── */
+
+/* Make the Forensic printable document preview look premium dark/blue on screen */
+@media screen {
+  .printable-area {
+    background-color: #0B1226 !important;
+    color: #F1F5F9 !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+  }
+  
+  .printable-area * {
+    border-color: rgba(59, 130, 246, 0.2) !important;
+  }
+
+  .printable-area h2, 
+  .printable-area h3, 
+  .printable-area strong, 
+  .printable-area b {
+    color: #FFFFFF !important;
+  }
+
+  .printable-area span,
+  .printable-area p,
+  .printable-area span.text-slate-650,
+  .printable-area span.text-slate-550,
+  .printable-area .text-slate-600,
+  .printable-area .text-slate-700,
+  .printable-area .text-slate-800 {
+    color: #94A3B8 !important;
+  }
+
+  .printable-area .border-slate-900 {
+    border-color: rgba(59, 130, 246, 0.3) !important;
+  }
+
+  .printable-area .bg-slate-100 {
+    background-color: #121F3F !important;
+  }
+
+  .printable-area .bg-rose-50 {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    color: #EF4444 !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+  }
+
+  /* Core Modal content background fixes to prevent raw white blocks */
+  .fixed div.bg-white {
+    background-color: #0B1226 !important;
+    color: #F1F5F9 !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  }
+
+  .fixed div.bg-white * {
+    color: #CBD5E1 !important;
+  }
+
+  .fixed div.bg-white strong,
+  .fixed div.bg-white h4,
+  .fixed div.bg-white h5 {
+    color: #FFFFFF !important;
+  }
+
+  .fixed div.bg-white .bg-slate-100 {
+    background-color: #121F3F !important;
+    color: #FFFFFF !important;
+  }
+
+  .fixed div.bg-white text-slate-900 {
+    color: #F1F5F9 !important;
+  }
+
+  /* Specific fix for italic blocks inside modals */
+  .fixed div.bg-white italic,
+  .fixed div.bg-white p.italic {
+    background-color: #060B1C !important;
+    color: #94A3B8 !important;
+    border-color: rgba(59, 130, 246, 0.15) !important;
+  }
+}
+
+/* Keeps standard print values pure clean white + black so prints/saves to PDF look like actual paper documents */
+@media print {
+  .printable-area {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .printable-area * {
+    color: #000055 !important;
+    border-color: #000000 !important;
+  }
+}
