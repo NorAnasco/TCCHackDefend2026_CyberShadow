@@ -112,9 +112,9 @@ Pour l'évaluation de notre Proof of Concept (PoC) par le jury, utilisez les acc
 ---------
 ## 👥 Membres de l'Équipe
 * **ANANIVI Komlanvi** — Etudiant Licence 2 
-* **RADJI** — Etudiant Licence 2
-* **KPETO** — Etudiant Licence 2
-* **EHE** — Etudiant Licence 2
+* **RADJI Kefyl** — Etudiant Licence 2
+* **KPETO Kokouvi Joël** — Etudiant Licence 2
+* **EHE Soler Godwin** — Etudiant Licence 2
 ---------
 
 Guide de Présentation pour le Hackathon #TCCHackDefend 2026 rédigé par l'équipe CyberShadow.
