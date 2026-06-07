@@ -53,7 +53,7 @@ async function startServer() {
       return;
     }
     
-    if (!token.startsWith("kfl-shield-")) {
+    if (!token.startsWith("kfl-shield-") && !token.startsWith("stl-shield-")) {
       console.warn(`[SOC-SECURITY-INTEGRITY] Blocked unauthorized agent token format: ${token}`);
       res.status(403).json({ success: false, error: "Jeton d'autorisation agent invalide ou révoqué par le SOC." });
       return;
@@ -64,16 +64,49 @@ async function startServer() {
     const timestamp = req.headers["x-timestamp"];
     
     console.log(`[SOC-SECURITY-INTEGRITY] Request authorized. Integrity-sig: ${signature || "N/A"}. Timestamp: ${timestamp || "N/A"}`);
+    
+    // Attempt to identify the agent from token suffix
+    try {
+      const parts = token.split("-");
+      const suffix = parts[parts.length - 1]; // get device_id.substring(0,6) or fallback device_id
+      if (suffix) {
+        const agents = dbManager.getAgents();
+        // Look for agent where either ID matches directly or starts with the suffix
+        const agent = agents.find(a => a.id.substring(0, 6) === suffix || a.id === suffix || a.id.startsWith(suffix));
+        if (agent) {
+          (req as any).agentId = agent.id;
+        }
+      }
+    } catch (e: any) {
+      console.error("[SOC-SECURITY-INTEGRITY] Error extracting agent suffix:", e.message);
+    }
+    
     next();
   };
 
   // E. Mobile Agent - Secure Handshake & Dynamic Token Registration
   app.post("/api/v1/agent/register", (req, res) => {
     try {
-      const { device_id, name, city } = req.body;
+      const { device_id, name, city, phone } = req.body;
       if (!device_id) {
         res.status(400).json({ success: false, error: "Identifiant unique de terminal (device_id) requis." });
         return;
+      }
+
+      // Check for duplicate phone number enrollment (strict multi-account prevention)
+      const cleanPhone = phone ? phone.trim().replace(/\s+/g, "") : "";
+      if (cleanPhone) {
+        const existingAgent = dbManager.getAgents().find(a => {
+          const existingCleanPhone = a.phone ? a.phone.trim().replace(/\s+/g, "") : "";
+          return existingCleanPhone === cleanPhone && a.id !== device_id;
+        });
+        if (existingAgent) {
+          res.status(400).json({ 
+            success: false, 
+            error: `Erreur d'enregistrement : Le numéro de téléphone ${phone} est déjà enrôlé pour un autre agent (ID : ${existingAgent.id}).` 
+          });
+          return;
+        }
       }
 
       const cleanLocation = city || "Lomé";
@@ -88,12 +121,19 @@ async function startServer() {
           id: device_id,
           name: name || `TG-Mobile-${device_id.substring(0, 6).toUpperCase()}`,
           city: cleanLocation,
+          phone: phone || undefined,
           status: "Online",
           lastSync: new Date().toISOString(),
           version: "v1.5.0",
           ipAddress: req.ip || "127.0.0.1"
         });
       } else {
+        // Update information if re-enrolled
+        agent.name = name || agent.name;
+        agent.city = cleanLocation;
+        if (phone) {
+          agent.phone = phone;
+        }
         dbManager.updateAgentLastSync(device_id);
       }
 
@@ -117,6 +157,14 @@ async function startServer() {
     try {
       const threats = dbManager.getThreats();
       const config = dbManager.getConfig();
+      
+      // If we identified the agent, let's update their status and lastSync timestamp!
+      const agentId = (req as any).agentId;
+      if (agentId) {
+        dbManager.updateAgentLastSync(agentId);
+        console.log(`[SOC-SYNC] Reconnected agent updated: ${agentId} is now synchronized with the latest signature base.`);
+      }
+
       // Format response exactly as expected by Retrofit Android client
       const mappedSignatures = threats.map((t, idx) => ({
         id: idx + 1,
@@ -247,6 +295,16 @@ async function startServer() {
          res.status(400).json({ success: false, error: "Missing required fields: type, value, severity" });
          return;
       }
+      
+      const cleanValue = value.trim();
+      const exists = dbManager.getThreats().some(
+        t => t.value.toLowerCase().trim() === cleanValue.toLowerCase()
+      );
+      if (exists) {
+        res.status(400).json({ success: false, error: "La signature existe déjà dans la base de données." });
+        return;
+      }
+
       const item = dbManager.addThreat({
         type,
         value,

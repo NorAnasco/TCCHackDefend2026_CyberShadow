@@ -37,14 +37,24 @@ public class SyncWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Log.i(TAG, "Démarrage de la synchronisation en arrière-plan avec KEFYL SOC.");
+        Log.i(TAG, "Démarrage de la synchronisation en arrière-plan avec SP Kéfyl SOC.");
 
         Context context = getApplicationContext();
         SharedPreferences prefs = context.getSharedPreferences("kefyl_prefs", Context.MODE_PRIVATE);
+        
+        boolean isFirstSyncDone = prefs.getBoolean("is_first_sync_done", false);
+        boolean isManualSync = getInputData().getBoolean("is_manual_sync", false);
+        
+        // Bloquer toute synchronisation automatique tant que l'utilisateur n'a pas activé la protection
+        if (!isFirstSyncDone && !isManualSync) {
+            Log.i(TAG, "Synchronisation automatique ignorée car l'application n'a pas encore activé sa première protection manuelle.");
+            return Result.success();
+        }
+
         String savedToken = prefs.getString("agent_secure_token", "");
         
         if (savedToken.isEmpty()) {
-            Log.i(TAG, "Aucun jeton d'agent trouvé. Tentative d'enrôlement dynamique auprès du SOC KÉFYL...");
+            Log.i(TAG, "Aucun jeton d'agent trouvé. Tentative d'enrôlement dynamique auprès du SOC SP Kéfyl...");
             String deviceId = android.provider.Settings.Secure.getString(
                     context.getContentResolver(), 
                     android.provider.Settings.Secure.ANDROID_ID
@@ -71,24 +81,57 @@ public class SyncWorker extends Worker {
             com.kefyl.shield.api.RegisterRequest req = new com.kefyl.shield.api.RegisterRequest(
                     deviceId,
                     agentDisplayName,
-                    regCity
+                    regCity,
+                    regPhone
             );
             
             try {
                 Response<com.kefyl.shield.api.RegisterResponse> regResponse = registerService.registerAgent(req).execute();
+                Intent syncIntent = new Intent("com.kefyl.shield.UPDATE_STATS");
                 if (regResponse.isSuccessful() && regResponse.body() != null && regResponse.body().isSuccess()) {
                     String newToken = regResponse.body().getToken();
                     prefs.edit().putString("agent_secure_token", newToken).apply();
-                    Log.i(TAG, "Enrôlement réussi ! Jeton reçu : " + newToken);
+                    Log.i(TAG, "Enrôlement pour SP Kéfyl réussi ! Jeton reçu : " + newToken);
+                    syncIntent.putExtra("enrollment_success", "Enrôlement réussi avec succès auprès du SOC national !");
                 } else {
-                    Log.e(TAG, "Échec d'enrôlement SOC (réponse HTTP: " + regResponse.code() + "). Utilisation du token de secours.");
+                    String errorMsg = null;
+                    if (regResponse.errorBody() != null) {
+                        try {
+                            String errStr = regResponse.errorBody().string();
+                            com.google.gson.JsonObject errObj = new com.google.gson.Gson().fromJson(errStr, com.google.gson.JsonObject.class);
+                            if (errObj != null && errObj.has("error")) {
+                                errorMsg = errObj.get("error").getAsString();
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Parsing error context: " + e.getMessage());
+                        }
+                    }
+                    if (errorMsg == null) {
+                        errorMsg = "Échec d'enrôlement SOC (réponse HTTP: " + regResponse.code() + ")";
+                    }
+                    Log.e(TAG, errorMsg);
+                    syncIntent.putExtra("enrollment_error", errorMsg);
+                    
+                    // Clear invalid registration details to force correct/unique details
+                    prefs.edit()
+                         .remove("agent_registered_name")
+                         .remove("agent_registered_phone")
+                         .remove("agent_secure_token")
+                         .apply();
                 }
+                context.sendBroadcast(syncIntent);
             } catch (IOException e) {
                 Log.e(TAG, "Impossible de s'enrôler dynamiquement (Problème réseau) : " + e.getMessage());
+                Intent syncIntent = new Intent("com.kefyl.shield.UPDATE_STATS");
+                syncIntent.putExtra("enrollment_error", "Erreur réseau : Impossible de contacter la console de sécurité nationale.");
+                context.sendBroadcast(syncIntent);
             }
         }
 
         KefylApiService apiService = RetrofitClient.getApiService(context);
+        
+        // Retransmettre les pièges évités hors-ligne en premier
+        RetrofitClient.syncOfflineReports(context);
         
         try {
             // Appel de synchronisation API
@@ -126,6 +169,9 @@ public class SyncWorker extends Worker {
 
                 // Enregistrement de la date de dernière mise à jour dans SharedPreferences
                 saveLastSyncTime();
+                
+                // Indiquer que la première synchronisation a été effectuée avec succès pour activer le bouclier
+                prefs.edit().putBoolean("is_first_sync_done", true).apply();
 
                 // Lancer une intention de mise à jour UI vers MainActivity
                 Intent updateUiIntent = new Intent("com.kefyl.shield.UPDATE_STATS");

@@ -6,13 +6,13 @@
     "defaultSyncIntervalDays": 14,
     "lastFlashUpdateAt": null,
     "flashUpdateStatus": "Idle",
-    "gatewayAddress": "http://102.64.21.30:3000"
+    "gatewayAddress": "https://sp-sentinel-hq.onrender.com"
   },
   "snapshots": [],
   "admins": [
     { "username": "ANANIVI", "password": "admin12345", "role": "Administrateur", "createdAt": "2026-05-27T12:00:00Z" },
     { "username": "RADJI", "password": "admin12345", "role": "Administrateur", "createdAt": "2026-05-27T12:00:00Z" },
     { "username": "KPETO", "password": "admin12345", "role": "Administrateur", "createdAt": "2026-05-27T12:00:00Z" },
-    { "username": "EHEY", "password": "admin12345", "role": "Administrateur", "createdAt": "2026-05-27T12:00:00Z" }
+    { "username": "EHE", "password": "admin12345", "role": "Administrateur", "createdAt": "2026-05-27T12:00:00Z" }
   ]
 }

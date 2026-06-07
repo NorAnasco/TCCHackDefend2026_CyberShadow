@@ -1,0 +1,82 @@
+{
+  "campaigns": [],
+  "threats": [],
+  "agents": [
+    {
+      "id": "SP-TG-SIMUL-PHONE",
+      "name": "TG-Mobile-SP-TG-SI",
+      "city": "Lomé",
+      "status": "Online",
+      "lastSync": "2026-06-02T20:54:12.852Z",
+      "version": "v1.5.0",
+      "ipAddress": "127.0.0.1"
+    }
+  ],
+  "config": {
+    "defaultSyncIntervalDays": 14,
+    "lastFlashUpdateAt": null,
+    "flashUpdateStatus": "Idle",
+    "gatewayAddress": "https://sp-sentinel-hq.onrender.com",
+    "customApiKey": null,
+    "aiSelection": "gemini"
+  },
+  "snapshots": [],
+  "admins": [
+    {
+      "username": "ANANIVI",
+      "password": "41e5653fc7aeb894026d6bb7b2db7f65902b454945fa8fd65a6327047b5277fb",
+      "role": "Administrateur",
+      "createdAt": "2026-05-27T12:00:00Z"
+    },
+    {
+      "username": "RADJI",
+      "password": "41e5653fc7aeb894026d6bb7b2db7f65902b454945fa8fd65a6327047b5277fb",
+      "role": "Administrateur",
+      "createdAt": "2026-05-27T12:00:00Z"
+    },
+    {
+      "username": "KPETO",
+      "password": "41e5653fc7aeb894026d6bb7b2db7f65902b454945fa8fd65a6327047b5277fb",
+      "role": "Administrateur",
+      "createdAt": "2026-05-27T12:00:00Z"
+    },
+    {
+      "username": "EHE",
+      "password": "41e5653fc7aeb894026d6bb7b2db7f65902b454945fa8fd65a6327047b5277fb",
+      "role": "Administrateur",
+      "createdAt": "2026-05-27T12:00:00Z"
+    }
+  ],
+  "mobileSignals": [
+    {
+      "deviceId": "SP-TG-SIMUL-PHONE",
+      "agentName": "TG-Mobile-SP-TG-SI",
+      "senderPhone": "+228 99 12 04 85",
+      "evidenceText": "[Flooz] Félicitations! Votre numéro a été tiré au sort pour la promotion de la fête nationale. Vous gagnez la somme de 300.000 FCFA. Appelez vite le 99120485 pour débloquer votre versement.",
+      "location": "Lomé",
+      "id": "sig-1780432723183-251",
+      "timestamp": "2026-06-02T20:38:43.183Z",
+      "status": "pending"
+    },
+    {
+      "deviceId": "SP-TG-SIMUL-PHONE",
+      "agentName": "TG-Mobile-SP-TG-SI",
+      "senderPhone": "+228 92 11 34 56",
+      "evidenceText": "Recrutement urgent ANCY: Subvention d'État disponible pour les citoyens étudiants et entrepreneurs du Togo (50.000F/mois). Inscrivez-vous vite: http://ancy.gouv.tg-subvention.net",
+      "location": "Lomé",
+      "id": "sig-1780433632386-746",
+      "timestamp": "2026-06-02T20:53:52.386Z",
+      "status": "pending"
+    },
+    {
+      "deviceId": "SP-TG-SIMUL-PHONE",
+      "agentName": "TG-Mobile-SP-TG-SI",
+      "senderPhone": "[Contact: Maman 🧑‍🍼] +228 90 12 34 56",
+      "evidenceText": "Recrutement urgent ANCY: Subvention d'État disponible pour les citoyens étudiants et entrepreneurs du Togo (50.000F/mois). Inscrivez-vous vite: http://ancy.gouv.tg-subvention.net",
+      "location": "Lomé",
+      "id": "sig-1780433652853-341",
+      "timestamp": "2026-06-02T20:54:12.853Z",
+      "status": "pending"
+    }
+  ]
+}

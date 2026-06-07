@@ -1,0 +1,16 @@
+{
+  "server_url": "http://localhost:8000",
+  "api_version": "v1",
+  "sync_interval_days_default": 14,
+  "endpoints": {
+    "sync": "/api/v1/sync",
+    "report": "/api/v1/report",
+    "threats": "/api/v1/threats",
+    "correlate": "/api/v1/correlate"
+  },
+  "java_agent_config": {
+    "volley_cache_timeout_ms": 30000,
+    "retrofit_base_url": "http://10.0.2.2:8000/",
+    "info": "Sur l'émulateur standard Android, 10.0.2.2 pointe vers le localhost de la machine hôte hébergeant le serveur FastAPI."
+  }
+}

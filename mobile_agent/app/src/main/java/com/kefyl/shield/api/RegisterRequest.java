@@ -13,10 +13,14 @@ public class RegisterRequest {
     @SerializedName("city")
     private String city;
 
-    public RegisterRequest(String deviceId, String name, String city) {
+    @SerializedName("phone")
+    private String phone;
+
+    public RegisterRequest(String deviceId, String name, String city, String phone) {
         this.deviceId = deviceId;
         this.name = name;
         this.city = city;
+        this.phone = phone;
     }
 
     public String getDeviceId() { return deviceId; }
@@ -27,4 +31,7 @@ public class RegisterRequest {
 
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 }

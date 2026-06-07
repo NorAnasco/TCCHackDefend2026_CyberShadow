@@ -29,6 +29,19 @@ public class PhishingAnalyzer {
      * @return La signature correspondante si compromission détectée, ou null
      */
     public Signature analyzeMessage(String text) {
+        return analyzeMessage(text, null);
+    }
+
+    /**
+     * Analyse le texte extrait de la notification (WhatsApp/SMS)
+     * et le compare à tous les patterns malveillants répertoriés en base de données,
+     * en prenant également en compte le numéro/identifiant de l'expéditeur.
+     * 
+     * @param text Message entier capturé de la notification
+     * @param senderPhone Numéro de téléphone ou identifiant de l'expéditeur
+     * @return La signature correspondante si compromission détectée, ou null
+     */
+    public Signature analyzeMessage(String text, String senderPhone) {
         if (text == null || text.trim().isEmpty()) {
             return null;
         }
@@ -41,25 +54,40 @@ public class PhishingAnalyzer {
             String lowerText = text.toLowerCase();
 
             // 1. Analyse si c'est un lien / domaine suspect
-            if ("URL".equalsIgnoreCase(signature.getType())) {
+            if ("URL".equalsIgnoreCase(signature.getType()) || "domain".equalsIgnoreCase(signature.getType())) {
                 if (lowerText.contains(patternStr)) {
                     return signature; // Correspondance trouvée!
                 }
             }
             
-            // 2. Analyse si c'est un numéro d'arnaqueur connu
+            // 2. Analyse si c'est un numéro d'arnaqueur connu (Signature de type PHONE)
             else if ("PHONE".equalsIgnoreCase(signature.getType())) {
-                // Nettoie l'espace pour maximiser le matching
-                String cleanText = lowerText.replaceAll("\\s+", "");
-                String cleanPattern = patternStr.replaceAll("\\s+", "");
+                // Vérifier si la signature coïncide avec le numéro de l'expéditeur
+                if (senderPhone != null && !senderPhone.trim().isEmpty()) {
+                    String cleanSender = senderPhone.toLowerCase().replaceAll("[^a-z0-9+]", "");
+                    String cleanPattern = patternStr.replaceAll("[^a-z0-9+]", "");
+                    
+                    // Comparaison souple (avec/sans préfixe pays)
+                    if (cleanSender.contains(cleanPattern) || cleanPattern.contains(cleanSender)) {
+                        return signature;
+                    }
+                }
+                
+                // Fallback: recherche du numéro suspect également au sein du corps du texte du message
+                String cleanText = lowerText.replaceAll("[^a-z0-9+]", "");
+                String cleanPattern = patternStr.replaceAll("[^a-z0-9+]", "");
                 if (cleanText.contains(cleanPattern)) {
                     return signature;
                 }
             }
             
-            // 3. Simple recherche textuelle
+            // 3. Simple recherche textuelle ou motif générique
             else {
-                if (lowerText.contains(patternStr)) {
+                // Nettoyage de ponctuation/espace des patrons de texte pour déjouer les variations d'interponction
+                String cleanText = lowerText.replaceAll("[^a-z0-9àéèêîôûç]", "");
+                String cleanPattern = patternStr.replaceAll("[^a-z0-9àéèêîôûç]", "");
+                
+                if (cleanText.contains(cleanPattern) || lowerText.contains(patternStr)) {
                     return signature;
                 }
             }

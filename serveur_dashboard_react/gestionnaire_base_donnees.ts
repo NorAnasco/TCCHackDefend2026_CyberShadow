@@ -38,6 +38,7 @@ export interface MobileAgent {
   id: string;
   name: string;
   city: string; // Lomé, Kara, Sokodé, Atakpamé, Kpalimé, Cinkassé
+  phone?: string; // Contact phone number
   status: "Online" | "Offline" | "Syncing";
   lastSync: string;
   version: string;
@@ -216,6 +217,39 @@ const demoDatabase: DatabaseSchema = {
       detectedAt: "2026-05-23T04:20:00Z",
       details: "Signature textuelle de chantage financier interceptée sur le réseau.",
       location: "Atakpamé"
+    },
+    {
+      id: "t-009",
+      type: "phone",
+      value: "71136441",
+      severity: "Critical",
+      status: "active",
+      campaignId: "c-002",
+      detectedAt: "2026-06-04T12:00:00Z",
+      details: "Numéro de test interceptateur pour démonstration - SOC Phishing TG (SP_TG)",
+      location: "Lomé"
+    },
+    {
+      id: "t-010",
+      type: "domain",
+      value: "okta-amazon.com",
+      severity: "Critical",
+      status: "active",
+      campaignId: "c-001",
+      detectedAt: "2026-06-04T12:05:00Z",
+      details: "Portail d'hameçonnage actif ciblant les identifiants d'administration des citoyens.",
+      location: "Lomé"
+    },
+    {
+      id: "t-011",
+      type: "ip",
+      value: "87.121.84.130",
+      severity: "Critical",
+      status: "active",
+      campaignId: "c-001",
+      detectedAt: "2026-06-04T12:10:00Z",
+      details: "IP malveillante répertoriée par les forces de l'ordre pour hébergement de phishing.",
+      location: "Sokodé"
     }
   ],
   agents: [
@@ -232,14 +266,14 @@ const demoDatabase: DatabaseSchema = {
     defaultSyncIntervalDays: 14,
     lastFlashUpdateAt: "2026-05-20T11:00:00Z",
     flashUpdateStatus: "Idle",
-    gatewayAddress: "http://102.64.21.30:3000"
+    gatewayAddress: "https://sp-sentinel-hq.onrender.com"
   },
   snapshots: [],
   admins: [
     { username: "ANANIVI", password: "admin12345", role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" },
     { username: "RADJI", password: "admin12345", role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" },
     { username: "KPETO", password: "admin12345", role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" },
-    { username: "EHEY", password: "admin12345", role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" }
+    { username: "EHE", password: "admin12345", role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" }
   ],
   mobileSignals: [
     {
@@ -293,14 +327,14 @@ const initialDatabase: DatabaseSchema = {
     defaultSyncIntervalDays: 14,
     lastFlashUpdateAt: null,
     flashUpdateStatus: "Idle",
-    gatewayAddress: "http://102.64.21.30:3000"
+    gatewayAddress: "https://sp-sentinel-hq.onrender.com"
   },
   snapshots: [],
   admins: [
     { username: "ANANIVI", password: "admin12345", role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" },
     { username: "RADJI", password: "admin12345", role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" },
     { username: "KPETO", password: "admin12345", role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" },
-    { username: "EHEY", password: "admin12345", role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" }
+    { username: "EHE", password: "admin12345", role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" }
   ],
   mobileSignals: []
 };
@@ -316,7 +350,7 @@ class DBManager {
       this.db.config = { ...initialDatabase.config };
     }
     if (this.db.config.gatewayAddress === undefined) {
-      this.db.config.gatewayAddress = "http://102.64.21.30:3000";
+      this.db.config.gatewayAddress = "https://sp-sentinel-hq.onrender.com";
     }
     if (this.db.config.customApiKey === undefined) {
       this.db.config.customApiKey = null;
@@ -335,7 +369,7 @@ class DBManager {
         { username: "ANANIVI", password: hashPassword("admin12345"), role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" },
         { username: "RADJI", password: hashPassword("admin12345"), role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" },
         { username: "KPETO", password: hashPassword("admin12345"), role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" },
-        { username: "EHEY", password: hashPassword("admin12345"), role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" }
+        { username: "EHE", password: hashPassword("admin12345"), role: "Administrateur", createdAt: "2026-05-27T12:00:00Z" }
       ];
     } else {
       // Automatic backward-compatible password migration to SHA-256 hash formatting
@@ -469,7 +503,7 @@ class DBManager {
     this.db.mobileSignals = [...(demoDatabase.mobileSignals || [])];
     this.db.config.lastFlashUpdateAt = demoDatabase.config.lastFlashUpdateAt;
     this.db.config.flashUpdateStatus = demoDatabase.config.flashUpdateStatus;
-    this.db.config.gatewayAddress = demoDatabase.config.gatewayAddress || "http://102.64.21.30:3000";
+    this.db.config.gatewayAddress = demoDatabase.config.gatewayAddress || "https://sp-sentinel-hq.onrender.com";
     this.save();
   }
 
@@ -479,6 +513,11 @@ class DBManager {
   }
 
   public addThreat(threat: Omit<Threat, "id" | "detectedAt">): Threat {
+    const cleanValue = threat.value.trim();
+    const exists = this.db.threats.some(t => t.value.trim().toLowerCase() === cleanValue.toLowerCase());
+    if (exists) {
+      throw new Error("La signature existe déjà dans la base de données.");
+    }
     const newThreat: Threat = {
       ...threat,
       id: `t-${Date.now()}`,
